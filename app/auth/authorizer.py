@@ -41,23 +41,47 @@ class Authorizer:
             process_method = getattr(self, f"process_{event_type}")
             response = process_method(event=event)
 
-            # Update event
+            # Update event dict
             event.update(response)
 
-            sys.stdout.write(json.dumps(response))
+            # Write event to stdout
+            sys.stdout.write(json.dumps(response, default=str, indent=4, sort_keys=True))
 
     def process_account_creation(self, event: dict) -> dict:
+        """
+        Process events related to account creation. Creates a new account instance if it wasn't created yet.
+        If account already been created, return 'account-already-initialized' violation
+
+        Args:
+            event (dict): Event with information related to account.
+
+        Returns:
+            event (dict): An dictionary with updated information related to account creation and possible violations
+        """
         if not self.account:
+            account_info = event.get('account', {})
+
             self.account = BankAccount(
-                available_limit=event.get('available-limit'),
-                active_card=bool(event.get('active-card'))
+                available_limit=account_info.get('available-limit'),
+                active_card=account_info.get('active-card')
             )
-            response = {}
+
+            event.update({'violations': []})
 
         else:
-            response = {}
+            event.update({'violations': ["account-already-initialized"]})
+
+        return event
 
     def process_transaction(self, event: dict) -> dict:
+        """
+
+        Args:
+            event:
+
+        Returns:
+
+        """
         if not self.account:
             return {'violations': ['account-not-initialized']}
 
@@ -66,9 +90,25 @@ class Authorizer:
             return {'violations': [v for v in violations]}
 
     def process_unknown(self, event: dict) -> dict:
+        """
+
+        Args:
+            event:
+
+        Returns:
+
+        """
         return {'violations': ['unknown-error']}
 
     def apply_validations(self, transaction: dict) -> Generator[str]:
+        """
+
+        Args:
+            transaction:
+
+        Returns:
+
+        """
         for validator in self.validations:
             violation = validator().validate(
                 account=self.account,
