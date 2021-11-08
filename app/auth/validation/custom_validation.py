@@ -2,6 +2,7 @@ from app.bank.account import BankAccount
 from app.auth.validation.base_validation import BaseValidation
 
 
+# TODO: CHECK BUSINESS RULES
 class CardNotActiveValidation(BaseValidation):
     """
     Validation to founded transactions where card isn't active on account.
