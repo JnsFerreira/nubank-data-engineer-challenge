@@ -19,6 +19,6 @@ class BaseValidation(ABC):
             transaction: A dict with the transaction to be validated
 
         Returns:
-
+            The violation founded, otherwise, an empty string
         """
         raise NotImplementedError
