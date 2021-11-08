@@ -14,10 +14,7 @@ def main() -> None:
     """
     events = parse_input_events()
     if events:
-        logger.log_entry(
-            message='Starting events processing.',
-            severity='INFO'
-        )
+        logger.info('Starting events processing.')
 
         Authorizer(
             events=events,
@@ -30,10 +27,7 @@ def main() -> None:
         ).process()
 
     else:
-        logger.log_entry(
-            message='No events founded. Skipping execution.',
-            severity='WARNING'
-        )
+        logger.warning('No events founded. Skipping execution.')
 
 
 if __name__ == '__main__':

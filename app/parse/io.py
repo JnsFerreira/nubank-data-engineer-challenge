@@ -6,7 +6,13 @@ from datetime import datetime
 
 
 def parse_input_events() -> Iterable:
-    """Generates a list from received events from stdin"""
+    """
+    Generates a list from received events from stdin.
+    Classify events into a type and converts time fields to python datetime format.
+
+    Yield:
+        data (dict): Formatted events received from stdin.
+    """
 
     for order, value in enumerate(fileinput.input()):
         data = json.loads(value)
