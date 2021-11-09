@@ -1,4 +1,9 @@
+# Built-in libraries
+from datetime import datetime, timedelta
+
+# Project libraries
 from app.bank.account import BankAccount
+from app.bank.transactions import BankStatement
 from app.auth.validation.base_validation import BaseValidation
 
 
@@ -50,7 +55,7 @@ class InsufficientLimitValidation(BaseValidation):
 
 class HighFreqSmallIntervalValidation(BaseValidation):
     """
-    Validation to high volume of transactions in a small interval
+    Validation to detect a high volume of transactions in a small interval.
 
     Given an account with an active card ( active-card: true ), available limit of 100
     ( available-limit: 100 ) and 3 transactions successfully occurred in the last 2 minutes.
@@ -73,10 +78,23 @@ class HighFreqSmallIntervalValidation(BaseValidation):
     {"account": {"active-card": true, "available-limit": 30}, "violations": []}
     """
     def validate(self, account: BankAccount, transaction: dict) -> str:
+        end_time = transaction.get('transaction', {}).get('time')
+        start_time = end_time - timedelta(minutes=2)
+
+        transactions = BankStatement.query_by_date(
+            account=account,
+            field='time',
+            start_date=start_time,
+            end_date=end_time
+        )
+
+        if len(list(transactions)) >= 3:
+            return 'highfrequency-small-interval'
+
         return ''
 
 
-class DoubleTransaction(BaseValidation):
+class DoubledTransaction(BaseValidation):
     """
     Validation to detected double transaction, known as financial chargeback.
 
@@ -95,8 +113,31 @@ class DoubleTransaction(BaseValidation):
     {"account": {"active-card": true, "available-limit": 100}, "violations": []}
     {"account": {"active-card": true, "available-limit": 80}, "violations": []}
     {"account": {"active-card": true, "available-limit": 70}, "violations": []}
-    {"account": {"active-card": true, "available-limit": 70}, "violations": ["doubledtransaction"]}
+    {"account": {"active-card": true, "available-limit": 70}, "violations": ["doubled-transaction"]}
     {"account": {"active-card": true, "available-limit": 55}, "violations": []}
     """
     def validate(self, account: BankAccount, transaction: dict) -> str:
+        transaction_info = transaction.get('transaction', {})
+        end_time = transaction_info.get('time')
+        start_time = end_time - timedelta(minutes=2)
+
+        transactions = BankStatement.query_by_date(
+            account=account,
+            field='time',
+            start_date=start_time,
+            end_date=end_time
+        )
+
+        amount = transaction_info.get('amount', '')
+        merchant = transaction_info.get('merchant', '')
+
+        for t in transactions:
+            t_info = t.get('transaction', {})
+            past_transaction_amount = t_info.get('amount', '')
+            past_transaction_merchant = t_info.get('merchant', '')
+
+            if (past_transaction_merchant == merchant) and \
+                    (past_transaction_amount == amount):
+                return 'doubled-transaction'
+
         return ''

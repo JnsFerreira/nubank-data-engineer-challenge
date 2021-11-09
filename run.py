@@ -22,7 +22,7 @@ def main() -> None:
                 CardNotActiveValidation,
                 InsufficientLimitValidation,
                 HighFreqSmallIntervalValidation,
-                DoubleTransaction
+                DoubledTransaction
             ]
         ).process()
 
