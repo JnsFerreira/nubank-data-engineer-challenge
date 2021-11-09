@@ -17,11 +17,21 @@ class BankStatement:
         Returns:
             None
         """
-        # TODO: Maybe add an custom exception
-        account.transactions.append(transaction)
+        try:
+            # Debit the amount from the available limit
+            transaction_amount = transaction.get('transaction', {}).get('amount', 0)
+            account.available_limit -= transaction_amount
+
+
+            # Register the transaction
+            account.transactions.append(transaction)
+
+        except Exception as e:
+            # TODO: Maybe add an custom exception
+            raise Exception(f"Could not registry transaction. Details: {e}")
 
     @classmethod
-    def query_by_field(cls, account: BankAccount, field: str, value: any) -> Generator[dict]:
+    def query_by_field(cls, account: BankAccount, field: str, value: any) -> Generator[dict, None, None]:
         """
         Query transactions on a bank account based on key: value pair
 
@@ -44,7 +54,7 @@ class BankStatement:
         field: str,
         start_date: datetime,
         end_date: datetime
-    ) -> Generator[dict]:
+    ) -> Generator[dict, None, None]:
         """
         Query transactions from a bank account based on a time interval.
         Will me yielded transactions where que date field is gather or equals to start_date and lower than end_date.

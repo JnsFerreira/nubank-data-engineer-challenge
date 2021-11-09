@@ -1,3 +1,4 @@
+# TODO: Add a class serializer
 class BankAccount:
     """Represents an bank account"""
     def __init__(
@@ -92,3 +93,11 @@ class BankAccount:
             self.__transactions = value
         else:
             raise ValueError(f"Expected type 'list', got: {type(value)} instead")
+
+    def to_dict(self):
+        return {
+            "account": {
+                "active_card": self.active_card,
+                "available_limit": self.available_limit,
+            }
+        }

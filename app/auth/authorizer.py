@@ -44,7 +44,8 @@ class Authorizer:
             response = process_method(event=event)
 
             # Write event to stdout
-            sys.stdout.write(json.dumps(response, default=str, indent=4, sort_keys=True))
+            #sys.stdout.write(json.dumps(response, default=str, indent=4, sort_keys=True))
+            print(response)
 
     def process_account_creation(self, event: dict) -> dict:
         """
@@ -58,19 +59,23 @@ class Authorizer:
             event (dict): An dictionary with updated information related to account creation and possible violations
         """
         if not self.account:
-            account_info = event.get('account', {})
+            account = event.get('account', {})
 
             self.account = BankAccount(
-                available_limit=account_info.get('available-limit'),
-                active_card=account_info.get('active-card')
+                available_limit=account.get('available-limit'),
+                active_card=account.get('active-card')
             )
 
-            event.update({'violations': []})
+            account_info = self.account.to_dict()
+            account_info.update({'violations': []})
 
         else:
-            event.update({'violations': ["account-already-initialized"]})
+            account_info = self.account.to_dict()
+            account_info.update(
+                {'violations': ["account-already-initialized"]}
+            )
 
-        return event
+        return account_info
 
     def process_transaction(self, event: dict) -> dict:
         """
@@ -86,13 +91,17 @@ class Authorizer:
         """
         # Checks if account exists
         if not self.account:
-            event.update({'violations': ['account-not-initialized']})
+            account_info = {"account": {}, 'violations': ['account-not-initialized']}
 
         else:
             violations = self.apply_validations(transaction=event)
-            event.update({'violations': [v for v in violations]})
 
-        return event
+            account_info = self.account.to_dict()
+            account_info.update(
+                {'violations': [v for v in violations]}
+            )
+
+        return account_info
 
     def process_unknown(self, event: dict) -> dict:
         """
@@ -108,7 +117,7 @@ class Authorizer:
 
         return event
 
-    def apply_validations(self, transaction: dict) -> Generator[str]:
+    def apply_validations(self, transaction: dict) -> list:
         """
         Apply validations specified on constructor to a single transaction.
 
@@ -119,19 +128,21 @@ class Authorizer:
             violation (dict): Violation founded on validator
         """
         # Apply validations
+        violations = []
         for validator in self.validations:
             violation = validator().validate(
                 account=self.account,
                 transaction=transaction
             )
-
-            # If violations was founded, returns yields the violation
+            # Appends to list if has an violation
             if violation:
-                yield violation
+                violations.append(violation)
 
-            # When no violations was founded, register the transaction to account
-            else:
-                BankStatement.register(
-                    account=self.account,
-                    transaction=transaction
-                )
+        # When no violations was founded, register the transaction to account
+        if not violations:
+            BankStatement.register(
+                account=self.account,
+                transaction=transaction
+            )
+
+        return violations
