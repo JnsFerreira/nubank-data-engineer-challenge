@@ -21,7 +21,7 @@ class CardNotActiveValidation(BaseValidation):
 
     # Output
      {"account": {"active-card": false, "available-limit": 100}, "violations": []}
-     {"account": {"active-card": false, "available-limit": 100}, "violations": ["cardnot-active"]}
+     {"account": {"active-card": false, "available-limit": 100}, "violations": ["card-not-active"]}
     """
     def validate(self, account: BankAccount, transaction: dict) -> str:
         if not account.active_card:
