@@ -41,7 +41,7 @@ class BankAccount:
         if isinstance(value, bool):
             self.__active_card = value
         else:
-            raise ValueError(f"Expected type 'boolean', got: {type(value)} instead")
+            raise TypeError(f"Expected type 'boolean', got: {type(value)} instead")
 
     @property
     def available_limit(self) -> int:
@@ -67,7 +67,7 @@ class BankAccount:
         if isinstance(value, int):
             self.__available_limit = value
         else:
-            raise ValueError(f"Expected integer, but got: {type(value)}")
+            raise TypeError(f"Expected integer, but got: {type(value)}")
 
     @property
     def transactions(self) -> list:
@@ -92,7 +92,7 @@ class BankAccount:
         if isinstance(value, list):
             self.__transactions = value
         else:
-            raise ValueError(f"Expected type 'list', got: {type(value)} instead")
+            raise TypeError(f"Expected type 'list', got: {type(value)} instead")
 
     def to_dict(self):
         return {

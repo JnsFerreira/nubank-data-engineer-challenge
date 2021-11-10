@@ -5,7 +5,7 @@ from typing import Iterable
 from datetime import datetime
 
 
-def parse_input_events() -> Iterable:
+def parse_input_events() -> Iterable[dict]:
     """
     Generates a list from received events from stdin.
     Classify events into a type and converts time fields to python datetime format.
