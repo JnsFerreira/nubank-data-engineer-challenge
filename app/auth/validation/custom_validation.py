@@ -89,7 +89,7 @@ class HighFreqSmallIntervalValidation(BaseValidation):
         )
 
         if len(list(transactions)) >= 3:
-            return 'highfrequency-small-interval'
+            return 'high-frequency-small-interval'
 
         return ''
 

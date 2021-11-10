@@ -1,6 +1,7 @@
 import pytest
 
 from app.bank.account import BankAccount
+from app.bank.transactions import BankStatement
 from app.auth.validation.custom_validation import *
 
 
@@ -31,7 +32,7 @@ class TestCardNotActiveValidation:
         )
 
     @pytest.mark.parametrize('transaction, output_violation', zip(INPUT, VIOLATION_OUTPUT))
-    def test_validation_violation_founded(
+    def test_validation_violation_found(
         self,
         validator,
         account_with_not_active_card,
@@ -47,7 +48,7 @@ class TestCardNotActiveValidation:
         assert violation == output_violation
 
     @pytest.mark.parametrize('transaction, output_violation', zip(INPUT, NORMAL_OUTPUT))
-    def test_validation_no_violation_founded(
+    def test_validation_no_violation_found(
             self,
             validator,
             account_with_active_card,
@@ -83,7 +84,7 @@ class TestInsufficientLimitValidation:
         )
 
     @pytest.mark.parametrize('transaction, output_violation', zip(INPUT, OUTPUT))
-    def test_validation(self, validator, account, transaction, output_violation):
+    def test_validation_proper_violation_found(self, validator, account, transaction, output_violation):
         violation = validator.validate(
             account=account,
             transaction=transaction
@@ -93,15 +94,19 @@ class TestInsufficientLimitValidation:
 
 
 class TestHighFreqSmallIntervalValidation:
-    INPUT = [
+    TRANSACTIONS = [
         {"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T11:00:00.000Z"}},
         {"transaction": {"merchant": "Habbib's", "amount": 20, "time": "2019-02-13T11:00:01.000Z"}},
-        {"transaction": {"merchant": "McDonald's", "amount": 20, "time": "2019-02-13T11:01:01.000Z"}},
-        {"transaction": {"merchant": "Subway", "amount": 20, "time": "2019-02-13T11:01:31.000Z"}},
-        {"transaction": {"merchant": "Burger King", "amount": 10, "time": "2019-02-13T12:00:00.000Z"}},
+        {"transaction": {"merchant": "McDonald's", "amount": 20, "time": "2019-02-13T11:0:02.000Z"}},
     ]
 
-    OUTPUT = ['', '', '', 'high-frequency-small-interval', '']
+    HIGH_FREQ_TRANSACTIONS = [
+        {"transaction": {"merchant": "Burger King", "amount": 10, "time": "2019-02-13T11:00:03.000Z"}},
+        {"transaction": {"merchant": "Subway", "amount": 20, "time": "2019-02-13T11:00:30.000Z"}},
+        {"transaction": {"merchant": "Burger King", "amount": 10, "time": "2019-02-13T11:01:00.000Z"}},
+    ]
+
+    OUTPUT = ['high-frequency-small-interval', 'high-frequency-small-interval', 'high-frequency-small-interval']
 
     @pytest.fixture
     def validator(self):
@@ -109,18 +114,31 @@ class TestHighFreqSmallIntervalValidation:
 
     @pytest.fixture
     def account(self):
-        return BankAccount(
+        account = BankAccount(
             active_card=True,
             available_limit=100
         )
 
-    @pytest.mark.parametrize('transaction, output_violation', zip(INPUT, OUTPUT))
-    def test_validation(
+        for t in self.TRANSACTIONS:
+            # Formatting as time field as datetime
+            transaction_info = t.get('transaction', {})
+            if not isinstance(transaction_info.get('time', ''), datetime):
+                transaction_info.update(
+                    {'time': datetime.strptime(transaction_info.get('time', ''), '%Y-%m-%dT%H:%M:%S.%fZ')}
+                )
+
+            # Registering transactions to account
+            BankStatement.register(account=account, transaction=t)
+
+        return account
+
+    @pytest.mark.parametrize('transaction, expected_output', zip(HIGH_FREQ_TRANSACTIONS, OUTPUT))
+    def test_validate(
             self,
             validator,
             account,
             transaction,
-            output_violation
+            expected_output
     ):
         transaction_info = transaction.get('transaction', {})
         transaction_info.update(
@@ -131,18 +149,25 @@ class TestHighFreqSmallIntervalValidation:
             account=account,
             transaction=transaction
         )
+        print(account.transactions)
 
-        assert violation == output_violation
+        assert violation == expected_output
 
 
 class TestDoubledTransaction:
-    INPUT = [
+    TRANSACTIONS = [
         {"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T11:00:00.000Z"}},
         {"transaction": {"merchant": "McDonald's", "amount": 10, "time": "2019-02-13T11:00:01.000Z"}},
-        {"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T11:00:02.000Z"}},
-        {"transaction": {"merchant": "Burger King", "amount": 15, "time": "2019-02-13T11:00:03.000Z"}},
+        {"transaction": {"merchant": "Burger King", "amount": 15, "time": "2019-02-13T11:00:03.000Z"}}
     ]
-    OUTPUT = ['', '', 'doubled-transaction', ''],
+
+    DOUBLE_TRANSACTIONS = [
+        {"transaction": {"merchant": "Burger King", "amount": 20, "time": "2019-02-13T11:00:02.000Z"}},
+        {"transaction": {"merchant": "McDonald's", "amount": 10, "time": "2019-02-13T11:01:01.000Z"}},
+        {"transaction": {"merchant": "Burger King", "amount": 15, "time": "2019-02-13T11:01:03.000Z"}}
+    ]
+
+    OUTPUT = ['doubled-transaction', 'doubled-transaction', 'doubled-transaction']
 
     @pytest.fixture
     def validator(self):
@@ -150,18 +175,31 @@ class TestDoubledTransaction:
 
     @pytest.fixture
     def account(self):
-        return BankAccount(
+        account = BankAccount(
             active_card=True,
             available_limit=100
         )
 
-    @pytest.mark.parametrize('transaction, output_violation', zip(INPUT, OUTPUT))
-    def test_validation(
+        for t in self.TRANSACTIONS:
+            # Formatting as time field as datetime
+            transaction_info = t.get('transaction', {})
+            if not isinstance(transaction_info.get('time', ''), datetime):
+                transaction_info.update(
+                    {'time': datetime.strptime(transaction_info.get('time', ''), '%Y-%m-%dT%H:%M:%S.%fZ')}
+                )
+
+            # Registering transactions to account
+            BankStatement.register(account=account, transaction=t)
+
+        return account
+
+    @pytest.mark.parametrize('transaction, expected_output', zip(DOUBLE_TRANSACTIONS, OUTPUT))
+    def test_validate(
             self,
             validator,
             account,
             transaction,
-            output_violation
+            expected_output
     ):
         transaction_info = transaction.get('transaction', {})
         transaction_info.update(
@@ -173,4 +211,4 @@ class TestDoubledTransaction:
             transaction=transaction
         )
 
-        assert violation == output_violation
+        assert violation == expected_output
