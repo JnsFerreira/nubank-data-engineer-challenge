@@ -1,6 +1,11 @@
-import pytest
+# Built-in libraries
+from io import StringIO
 
+# Project libraries
 from app.parse.io import parse_input_events
+
+# External libraries
+import pytest
 
 
 class TestParseInputEvents:
@@ -20,14 +25,32 @@ class TestParseInputEvents:
         '{"random_key": {"another": "event"}}'
     ]
 
-    def test_parse_account_events(self):
-        pass
+    EMPTY_EVENTS = []
 
-    def test_parse_transaction_events(self):
-        pass
+    @pytest.mark.parametrize('event', ACCOUNT_EVENTS)
+    def test_parse_account_events(self, monkeypatch, event):
+        monkeypatch.setattr('sys.stdin', StringIO(event))
 
-    def test_parse_unknown_events(self):
-        pass
+        for parsed_event in parse_input_events():
+            assert parsed_event.get('event_type') == 'account_creation'
 
-    def parse_empty_events(self):
-        pass
+    @pytest.mark.parametrize('event', TRANSACTION_EVENTS)
+    def test_parse_transaction_events(self, monkeypatch, event):
+        monkeypatch.setattr('sys.stdin', StringIO(event))
+
+        for parsed_event in parse_input_events():
+            assert parsed_event.get('event_type') == 'transaction'
+
+    @pytest.mark.parametrize('event', UNKNOWN_EVENTS)
+    def test_parse_unknown_events(self, monkeypatch, event):
+        monkeypatch.setattr('sys.stdin', StringIO(event))
+
+        for parsed_event in parse_input_events():
+            assert parsed_event.get('event_type') == 'unknown'
+
+    @pytest.mark.parametrize('event', EMPTY_EVENTS)
+    def parse_empty_events(self, monkeypatch, event):
+        monkeypatch.setattr('sys.stdin', StringIO(event))
+
+        for parsed_event in parse_input_events():
+            assert parsed_event.get('event_type', '') == ''

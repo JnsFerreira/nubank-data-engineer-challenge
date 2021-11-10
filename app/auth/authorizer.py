@@ -44,8 +44,9 @@ class Authorizer:
             response = process_method(event=event)
 
             # Write event to stdout
-            #sys.stdout.write(json.dumps(response, default=str, indent=4, sort_keys=True))
-            print(response)
+            sys.stdout.write(
+                f"{json.dumps(response, default=str, sort_keys=True)}\n"
+            )
 
     def process_account_creation(self, event: dict) -> dict:
         """

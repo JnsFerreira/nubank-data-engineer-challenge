@@ -1,6 +1,6 @@
 # Built-in libraries
+import sys
 import json
-import fileinput
 from typing import Iterable
 from datetime import datetime
 
@@ -14,7 +14,7 @@ def parse_input_events() -> Iterable[dict]:
         data (dict): Formatted events received from stdin.
     """
 
-    for order, value in enumerate(fileinput.input()):
+    for order, value in enumerate(sys.stdin.readlines()):
         data = json.loads(value)
 
         if 'account' in data:
