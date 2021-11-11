@@ -27,7 +27,14 @@ that is being processed:
 
 ## Code Architecture
 
-...
+The project was built using object-oriented concepts. Below, the main classes and their respective function: 
+
+* **BankAccount:** Represents the bank account where transactions will be performed
+* **BankStatement:** Used to record and query transactions
+* **Authorizer:** Orchestrates the main flow of the authorizer, based on incoming events, applies validations in order to find violations
+* **BaseValidation:** Abstract class that represents the basics of a validation. If you want to implement new validations, just implement its abstract methods
+* **SomeValidation:** Any concrete class that implements the `BaseValidation` class. It can be provided to the authorizer, through the `Authorizer` class, to be included in the validations
+
 
 ## Running
 
