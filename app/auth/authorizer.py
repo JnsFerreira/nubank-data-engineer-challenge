@@ -1,6 +1,4 @@
 # Built-in libraries
-import sys
-import json
 from typing import Iterable, Generator
 
 # Project libraries
@@ -28,7 +26,7 @@ class Authorizer:
         self.validations = validations
         self.account = None
 
-    def process(self) -> None:
+    def process(self) -> Generator[dict, None, None]:
         """
         Starts the validations for all transactions.
 
@@ -41,12 +39,8 @@ class Authorizer:
 
             # Apply verifications based on event type
             process_method = getattr(self, f"process_{event_type}")
-            response = process_method(event=event)
 
-            # Write event to stdout
-            sys.stdout.write(
-                f"{json.dumps(response, default=str, sort_keys=True)}\n"
-            )
+            yield process_method(event=event)
 
     def process_account_creation(self, event: dict) -> dict:
         """

@@ -132,7 +132,7 @@ This stage is responsible for:
 
 * Python image download
 * Installation of pypi dependencies
-* Execution of unit tests
+* Execution of tests
 * Code execution
 
 Once you've built your docker container, run the following:

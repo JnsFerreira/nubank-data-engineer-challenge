@@ -1,3 +1,7 @@
+# Built-in libraries
+import sys
+import json
+
 # Project libraries
 from app.service.logging import logger
 from app.auth.authorizer import Authorizer
@@ -16,7 +20,7 @@ def main() -> None:
     if events:
         logger.info('Starting events processing.')
 
-        Authorizer(
+        auth = Authorizer(
             events=events,
             validations=[
                 CardNotActiveValidation,
@@ -24,7 +28,15 @@ def main() -> None:
                 HighFreqSmallIntervalValidation,
                 DoubledTransaction
             ]
-        ).process()
+        )
+
+        for processed_event in auth.process():
+            # Write event to stdout
+            sys.stdout.write(
+                f"{json.dumps(processed_event, default=str, sort_keys=True)}\n"
+            )
+
+        logger.info("Done! All events have been processed.")
 
     else:
         logger.warning('No events found. Skipping execution.')

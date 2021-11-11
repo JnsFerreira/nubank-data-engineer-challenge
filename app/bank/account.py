@@ -96,7 +96,7 @@ class BankAccount:
     def to_dict(self):
         return {
             "account": {
-                "active_card": self.active_card,
-                "available_limit": self.available_limit,
+                "active-card": self.active_card,
+                "available-limit": self.available_limit,
             }
         }

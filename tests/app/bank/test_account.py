@@ -50,8 +50,8 @@ class TestBankAccount:
     def test_account_to_dict_normal_condition(self, account):
         expected_value = {
             "account": {
-                "active_card": True,
-                "available_limit": 1000
+                "active-card": True,
+                "available-limit": 1000
             }
         }
 
