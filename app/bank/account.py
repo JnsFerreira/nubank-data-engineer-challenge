@@ -1,4 +1,3 @@
-# TODO: Add a class serializer
 class BankAccount:
     """Represents an bank account"""
     def __init__(

@@ -27,7 +27,7 @@ def main() -> None:
         ).process()
 
     else:
-        logger.warning('No events founded. Skipping execution.')
+        logger.warning('No events found. Skipping execution.')
 
 
 if __name__ == '__main__':

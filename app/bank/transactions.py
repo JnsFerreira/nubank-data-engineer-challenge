@@ -1,5 +1,8 @@
+# Built-in libraries
 from typing import Generator
 from datetime import datetime
+
+# Project libraries
 from app.bank.account import BankAccount
 
 

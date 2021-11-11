@@ -35,6 +35,54 @@ The project was built using object-oriented concepts. Below, the main classes an
 * **BaseValidation:** Abstract class that represents the basics of a validation. If you want to implement new validations, just implement its abstract methods
 * **SomeValidation:** Any concrete class that implements the `BaseValidation` class. It can be provided to the authorizer, through the `Authorizer` class, to be included in the validations
 
+### Project folder structure
+ ```bash
+.
+├── app
+│   ├── auth
+│   │   ├── authorizer.py
+│   │   ├── __init__.py
+│   │   └── validation
+│   │       ├── base_validation.py
+│   │       ├── custom_validation.py
+│   │       ├── __init__.py
+│   ├── bank
+│   │   ├── account.py
+│   │   ├── __init__.py
+│   │   └── transactions.py
+│   ├── __init__.py
+│   ├── parse
+│   │   ├── __init__.py
+│   │   └── io.py
+│   └── service
+│       ├── __init__.py
+│       └── logging
+│           ├── __init__.py
+│           └── local_logging.py
+├── dockerfile
+├── project_tree.txt
+├── README.md
+├── requirements.txt
+├── run.py
+├── tests
+│   ├── app
+│   │   ├── auth
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   ├── test_authorizer.py
+│   │   │   └── validation
+│   │   │       ├── __init__.py
+│   │   │       ├── test_base_validation.py
+│   │   │       └── test_custom_validation.py
+│   │   ├── bank
+│   │   │   ├── __init__.py
+│   │   │   ├── test_account.py
+│   │   │   └── test_transactions.py
+│   │   ├── parse
+│   │   │   ├── __init__.py
+│   │   │   └── test_io.py
+│   ├── __init__.py
+```
 
 ## Running
 

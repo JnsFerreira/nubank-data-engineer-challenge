@@ -1,17 +1,17 @@
 # Built-in libraries
 import sys
 import json
-from typing import Iterable
 from datetime import datetime
+from typing import Generator
 
 
-def parse_input_events() -> Iterable[dict]:
+def parse_input_events() -> Generator[dict, None, None]:
     """
-    Generates a list from received events from stdin.
+    Generates a list from received events from standard input (stdin).
     Classify events into a type and converts time fields to python datetime format.
 
     Yield:
-        data (dict): Formatted events received from stdin.
+        data (dict): Formatted events received from standard input (stdin).
     """
 
     for order, value in enumerate(sys.stdin.readlines()):

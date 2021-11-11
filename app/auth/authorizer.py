@@ -81,14 +81,14 @@ class Authorizer:
     def process_transaction(self, event: dict) -> dict:
         """
         Process events related to account transactions. Creates a new key value pair at event containing,
-        if founded, any violations based on predefined validations.
+        if found, any violations based on predefined validations.
 
         Args:
             event (dict): Event with information related to an account transaction
 
         Returns:
-            event (dict): The original event with possible founded violations.
-            If wasn't founded any violation, violations field will be an empty list.
+            event (dict): The original event with possible found violations.
+            If wasn't found any violation, violations field will be an empty list.
         """
         # Checks if account exists
         if not self.account:
@@ -126,7 +126,7 @@ class Authorizer:
             transaction (dict): An transaction of type 'transaction' to be validated
 
         Yield:
-            violation (dict): Violation founded on validator
+            violation (dict): Violation found on validator
         """
         # Apply validations
         violations = []
@@ -139,7 +139,7 @@ class Authorizer:
             if violation:
                 violations.append(violation)
 
-        # When no violations was founded, register the transaction to account
+        # When no violations was found, register the transaction to account
         if not violations:
             BankStatement.register(
                 account=self.account,

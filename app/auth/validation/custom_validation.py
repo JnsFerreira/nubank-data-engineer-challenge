@@ -7,10 +7,9 @@ from app.bank.transactions import BankStatement
 from app.auth.validation.base_validation import BaseValidation
 
 
-# TODO: CHECK BUSINESS RULES
 class CardNotActiveValidation(BaseValidation):
     """
-    Validation to founded transactions where card isn't active on account.
+    Validation to found transactions where card isn't active on account.
 
     Given an account with the card inactive ( active-card: false ) when any transaction operation is
     submitted, the Authorizer must reject the operation and return the violation card-not-active.
@@ -96,7 +95,7 @@ class HighFreqSmallIntervalValidation(BaseValidation):
 
 class DoubledTransaction(BaseValidation):
     """
-    Validation to detected double transaction, known as financial chargeback.
+    Validation to detect double transaction, known as financial chargeback.
 
     Given an account with an active card ( active-card: true ), available limit of 100
     ( available-limit: 100 ) and some successful transactions in the last 2 minutes. The Authorizer must reject the

@@ -1,5 +1,7 @@
+# Project libraries
 from app.auth.authorizer import Authorizer
 
+# External libraries
 import pytest
 
 
