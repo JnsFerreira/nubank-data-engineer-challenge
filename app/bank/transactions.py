@@ -25,12 +25,10 @@ class BankStatement:
             transaction_amount = transaction.get('transaction', {}).get('amount', 0)
             account.available_limit -= transaction_amount
 
-
             # Register the transaction
             account.transactions.append(transaction)
 
         except Exception as e:
-            # TODO: Maybe add an custom exception
             raise Exception(f"Could not registry transaction. Details: {e}")
 
     @classmethod
@@ -46,9 +44,11 @@ class BankStatement:
        Yield:
             t (dict): Transactions that meet the criteria
         """
-        return next(
-            (t for t in account.transactions if t.get('transaction', {}).get(field, '') == value), {}
-        )
+
+        for t in account.transactions:
+            if t.get('transaction', {}).get(field, '') == value:
+                yield t
+
 
     @classmethod
     def query_by_date(
