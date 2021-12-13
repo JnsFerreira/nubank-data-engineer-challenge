@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # nubank-data-engineer-challenge
 Code Challenge: Autorizador
 =======
@@ -144,4 +143,3 @@ Once you've built your docker container, run the following:
 ```bash
 docker run -i  authorizer < operations.jsonl
 ```
->>>>>>> 81086b2ed6172fdd309b0204822cb9b72f43d29d
